@@ -7,6 +7,7 @@ import requests
 
 DOWNLOADED_FILES_PATH = 'downloadedAudioFiles'
 DEST_PATH_ON_DEVICE = '/sdcard/testPlaylist'
+TRACKED_PLAYLISTS_FILE_PATH = 'trackedPlaylists.txt'
 
 prnt = pprint.PrettyPrinter(indent=4).pprint
 
@@ -41,6 +42,7 @@ def download_audio_files_from_yt(urls):
         print("Video downloaded!")
 
 
+
 def get_yt_playlist_contents(playlist_url):
     response = requests.get(playlist_url)
     soup = BeautifulSoup(response.text,'lxml')
@@ -56,12 +58,15 @@ def get_yt_playlist_contents(playlist_url):
     return found_links
 
 
-if __name__ == '__main__':
-    # Test for downloading audio from a video and putting in on the connected device
-    # urls = ['https://www.youtube.com/watch?v=xWOoBJUqlbI']
-    # download_audio_files_from_yt(urls)
-    # put_file_on_connected_device(DOWNLOADED_FILES_PATH, DEST_PATH_ON_DEVICE)
+def get_tracked_playlists():
+    trackedPlaylists = {}
+    with open(TRACKED_PLAYLISTS_FILE_PATH) as trackedPlaylistsFile:
+        for line in trackedPlaylistsFile:
+            title, url = line.split()
+            trackedPlaylists[title] = url
+    return trackedPlaylists
 
-    # Test for getting a list of video urls from a playlist
-    url = 'https://www.youtube.com/playlist?list=PL1WyaSvUwdxcXb-V08h4rsRLjGCjKoUVd'
-    print(get_yt_playlist_contents(url))
+
+
+if __name__ == '__main__':
+    trackedPlaylists = get_tracked_playlists()
