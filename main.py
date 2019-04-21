@@ -5,8 +5,6 @@ from pytube import YouTube
 from bs4 import BeautifulSoup
 import requests
 
-DOWNLOADED_FILES_PATH = 'downloadedAudioFiles'
-DEST_PATH_ON_DEVICE = '/sdcard/testPlaylist'
 TRACKED_PLAYLISTS_FILE_PATH = 'trackedPlaylists.txt'
 
 prnt = pprint.PrettyPrinter(indent=4).pprint
@@ -26,20 +24,6 @@ def put_file_on_connected_device(source, dest):
     print("Output of the command:")
     print(output)
 
-
-def download_audio_files_from_yt(urls):
-    for url in urls:
-        try:
-            ytVideo = YouTube(url)
-        except:
-            raise Exception('An error ocurred while creating YouTube object')
-        audioFiles = ytVideo.streams.filter(only_audio=True).all()
-        print("Downloading video...")
-        try:
-            audioFiles[1].download(DOWNLOADED_FILES_PATH)
-        except:
-            print("Error while downloading video!")
-        print("Video downloaded!")
 
 
 
@@ -66,6 +50,24 @@ def get_tracked_playlists():
             trackedPlaylists[title] = url
     return trackedPlaylists
 
+
+class YoutubeAudioFilesDownloader:
+    def __init__(self, urls, dest_path_on_device, dest_path_local):
+        self.urls = urls
+        self.dest_path_on_device = dest_path_on_device
+        self.dest_path_local = dest_path_local
+
+
+    def add_url(self):
+        pass
+
+
+    def download_all_files_from_urls(self):
+        pass
+
+
+    def download_file_from_url(self, url):
+        pass
 
 
 if __name__ == '__main__':
