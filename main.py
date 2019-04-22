@@ -75,12 +75,37 @@ class YoutubeAudioFilesDownloader:
         print(f"{yt_video.title} was downloaded successfully!")
 
 
+class YouTubePlaylist:
+    def __init__(self, url):
+        self.url = url
+        response = requests.get(url)
+        self.soup = BeautifulSoup(response.text,'lxml')
+        self.update_info()
+
+
+    def update_info(self):
+        self.get_content_urls()
+        self.get_title()
+
+
+    def get_content_urls(self):
+        wanted_class = 'pl-video-title-link'
+        found_links = []
+        for a in self.soup.find_all('a'):
+            try:
+                curr_class = a['class']
+            except:
+                continue
+            if wanted_class in curr_class:
+                found_links.append(a['href'])
+        self.content_urls = found_links.copy()
+
+
+    def get_title(self):
+        self.title = self.soup.find('h1',attrs={'class':'pl-header-title'}).text.strip()
+
+
 if __name__ == '__main__':
-    urls = [
-    'https://www.youtube.com/watch?v=nsufd9Ckiko',
-    'https://www.youtube.com/watch?v=oG0XcvGLoq0',
-    'https://www.youtube.com/watch?v=u7kaOntQbsw',
-    ]
-    dest_local = 'downloadedAudioFiles'
-    test_batch = YoutubeAudioFilesDownloader(urls, dest_local)
-    test_batch.download_all_files_from_urls()
+    test_playlist = YouTubePlaylist('https://www.google.com/')
+    print(test_playlist.title)
+    print(test_playlist.content_urls)
