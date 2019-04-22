@@ -27,20 +27,6 @@ def put_file_on_connected_device(source, dest):
 
 
 
-def get_yt_playlist_contents(playlist_url):
-    response = requests.get(playlist_url)
-    soup = BeautifulSoup(response.text,'lxml')
-    wanted_class = 'pl-video-title-link'
-    found_links = []
-    for a in soup.find_all('a'):
-        try:
-            curr_class = a['class']
-        except:
-            continue
-        if wanted_class in curr_class:
-            found_links.append(a['href'])
-    return found_links
-
 
 def get_tracked_playlists():
     trackedPlaylists = {}
@@ -51,24 +37,50 @@ def get_tracked_playlists():
     return trackedPlaylists
 
 
+def ziplist(a,b):
+    return [list(x) for x in zip(a,b)]
+
+
+
 class YoutubeAudioFilesDownloader:
-    def __init__(self, urls, dest_path_on_device, dest_path_local):
-        self.urls = urls
-        self.dest_path_on_device = dest_path_on_device
-        self.dest_path_local = dest_path_local
-
-
-    def add_url(self):
-        pass
+    def __init__(self, urls, dest_path):
+        # urls get zipped with an array of Falses to keep track of which files were
+        # already downloaded (False if not True if yes)
+        self.url_isdownloaded_pairs = ziplist(urls,[False for i in range(len(urls))])
+        self.dest_path = dest_path
 
 
     def download_all_files_from_urls(self):
-        pass
+        list(map(self.download_error_checks,self.url_isdownloaded_pairs))
+
+
+    def download_error_checks(self, url_isdownloaded_pair):
+        url, is_downloaded = url_isdownloaded_pair
+        if is_downloaded:
+            print(f"{url} has already been downloaded")
+            return
+        try:
+            self.download_file_from_url(url)
+        except:
+            print(f"Error while downloading {url}")
+        else:
+            url_isdownloaded_pair[1] = True
 
 
     def download_file_from_url(self, url):
-        pass
+        yt_video = YouTube(url)
+        audio_files = yt_video.streams.filter(only_audio=True).all()
+        print(f"Downloading {yt_video.title}...")
+        audio_files[1].download(self.dest_path)
+        print(f"{yt_video.title} was downloaded successfully!")
 
 
 if __name__ == '__main__':
-    trackedPlaylists = get_tracked_playlists()
+    urls = [
+    'https://www.youtube.com/watch?v=nsufd9Ckiko',
+    'https://www.youtube.com/watch?v=oG0XcvGLoq0',
+    'https://www.youtube.com/watch?v=u7kaOntQbsw',
+    ]
+    dest_local = 'downloadedAudioFiles'
+    test_batch = YoutubeAudioFilesDownloader(urls, dest_local)
+    test_batch.download_all_files_from_urls()
