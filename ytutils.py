@@ -39,6 +39,7 @@ class YoutubeAudioFilesDownloader:
         print(f"{yt_video.title} was downloaded successfully!")
 
 
+
 class YouTubePlaylistInfo:
     def __init__(self, url):
         self.url = url
@@ -47,12 +48,19 @@ class YouTubePlaylistInfo:
         self.update_info()
 
 
+    def get_new_and_deleted_urls(self):
+        old_content_urls = content_urls[:]
+        self.update_info()
+        return (list_diff(self.content_urls, old_content_urls),
+                list_diff(old_content_urls - self.content_urls))
+
+
     def update_info(self):
-        self.get_content_urls()
-        self.get_title()
+        self.update_content_urls()
+        self.update_title()
 
 
-    def get_content_urls(self):
+    def update_content_urls(self):
         wanted_class = 'pl-video-title-link'
         found_links = []
         for a in self.soup.find_all('a'):
@@ -65,5 +73,9 @@ class YouTubePlaylistInfo:
         self.content_urls = found_links.copy()
 
 
-    def get_title(self):
+    def update_title(self):
         self.title = self.soup.find('h1',attrs={'class':'pl-header-title'}).text.strip()
+
+
+def list_diff(a, b):
+    return list(set(a) - set(b))
