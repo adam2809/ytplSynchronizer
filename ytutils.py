@@ -10,10 +10,6 @@ class YoutubeAudioFilesDownloader:
         self.dest_path = dest_path
 
 
-    def ziplist(a,b):
-        return [list(x) for x in zip(a,b)]
-
-
     def download_all_files_from_urls(self):
         list(map(self.download_error_checks,self.url_isdownloaded_pairs))
 
@@ -25,8 +21,8 @@ class YoutubeAudioFilesDownloader:
             return
         try:
             self.download_file_from_url(url)
-        except:
-            print(f"Error while downloading {url}")
+        except e:
+            print(f"Error while downloading {url}. The error message was:\n{str(e)}")
         else:
             url_isdownloaded_pair[1] = True
 
@@ -35,9 +31,16 @@ class YoutubeAudioFilesDownloader:
         yt_video = YouTube(url)
         audio_files = yt_video.streams.filter(only_audio=True).all()
         print(f"Downloading {yt_video.title}...")
-        audio_files[1].download(self.dest_path)
+        audio_files[1].download(self.dest_path, on_progress_callback=show_progress_message)
         print(f"{yt_video.title} was downloaded successfully!")
 
+    def show_progress_message(self, stream, chunk, file_handle, bytes_remaining):
+        progress = (1 - (bytes_remaining / stream.filesize)) * 100
+        print('{:00.0f}% downloaded'.format(progress))
+
+
+def ziplist(a,b):
+    return [list(x) for x in zip(a,b)]
 
 
 class YouTubePlaylistInfo:
