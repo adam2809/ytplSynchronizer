@@ -2,7 +2,7 @@ import subprocess
 import os
 import pprint
 
-from ytutils import YouTubePlaylistInfo, YoutubeAudioFilesDownloader
+from ytplsynch import YouTubePlaylistInfo, YouTubeAudioFilesDownloader
 
 TRACKED_PLAYLISTS_FILE_PATH = 'trackedPlaylists.txt'
 
@@ -77,6 +77,7 @@ def run_command(command):
 'An error ocurred while extracting the playlists info. Make sure the URL is correct. The synchronizer initialization is aborted'
 
 if __name__ == '__main__':
-    test_playlist = YouTubePlaylist('https://www.google.com/')
-    print(test_playlist.title)
-    print(test_playlist.content_urls)
+    downloader = YouTubeAudioFilesDownloader([],'downloadedAudioFiles')
+    # url = 'https://www.youtube.com/watch?v=oG0XcvGLoq0'
+    url = 'https://www.youtube.com/watch?v=Z3gOJF1qnXM'
+    downloader.download_file_from_url(url)

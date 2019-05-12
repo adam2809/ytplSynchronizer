@@ -1,13 +1,17 @@
 from pytube import YouTube
+from pytube.exceptions import RegexMatchError
 from bs4 import BeautifulSoup
+import os
 import requests
 
-class YoutubeAudioFilesDownloader:
+class YouTubeAudioFilesDownloader:
     def __init__(self, urls, dest_path):
         # urls get zipped with an array of Falses to keep track of which files were
         # already downloaded (False if not True if yes)
         self.url_isdownloaded_pairs = ziplist(urls,[False for i in range(len(urls))])
         self.dest_path = dest_path
+        if not os.path.isdir(dest_path):
+            os.mkdir(dest_path)
 
 
     def download_all_files_from_urls(self):
@@ -21,8 +25,8 @@ class YoutubeAudioFilesDownloader:
             return
         try:
             self.download_file_from_url(url)
-        except e:
-            print(f"Error while downloading {url}. The error message was:\n{str(e)}")
+        except RegexMatchError:
+            print(f"Could not find {url}")
         else:
             url_isdownloaded_pair[1] = True
 
@@ -33,6 +37,7 @@ class YoutubeAudioFilesDownloader:
         print(f"Downloading {yt_video.title}...")
         audio_files[1].download(self.dest_path, on_progress_callback=show_progress_message)
         print(f"{yt_video.title} was downloaded successfully!")
+
 
     def show_progress_message(self, stream, chunk, file_handle, bytes_remaining):
         progress = (1 - (bytes_remaining / stream.filesize)) * 100
